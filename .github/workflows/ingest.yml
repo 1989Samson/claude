@@ -31,8 +31,12 @@ jobs:
           APP_URL: ${{ secrets.APP_URL }}
           INGEST_API_TOKEN: ${{ secrets.INGEST_API_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # SOURCE selects the adapter (default gsa). DATA_GOV_API_KEY is a free
+          # key from https://api.data.gov/signup/ (DEMO_KEY works at low volume).
+          SOURCE: ${{ vars.INGEST_SOURCE }}
+          DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
           INGEST_MODEL: ${{ vars.INGEST_MODEL }}
-          GOVPLANET_RESULTS_URLS: ${{ vars.GOVPLANET_RESULTS_URLS }}
+          GSA_AUCTIONS_URL: ${{ vars.GSA_AUCTIONS_URL }}
           MAX_LOTS: ${{ vars.MAX_LOTS }}
         run: |
-          npm run ingest:govplanet -- ${{ inputs.dry_run && '--dry-run' || '' }}
+          npm run ingest -- ${{ inputs.dry_run && '--dry-run' || '' }}

@@ -16,7 +16,7 @@ export interface NormalizedRow {
   classId: string;
   price: number;
   cur: "CAD" | "USD";
-  type: "auction";
+  type: "auction" | "asking";
   rating?: number;
   hours?: string;
   cond?: string;
@@ -165,12 +165,12 @@ export async function normalizeLot(
     return null;
   }
 
-  const cur: "CAD" | "USD" = lot.currencyHint ?? "USD"; // GovPlanet US results are USD
+  const cur: "CAD" | "USD" = lot.currencyHint ?? "USD"; // US sources default to USD
   return {
     classId: input.classId,
     price: lot.price,
     cur,
-    type: "auction",
+    type: lot.sourceType ?? "auction",
     rating: input.rating ?? undefined,
     hours: HOURS.includes(input.hoursBand ?? "") ? input.hoursBand : "unknown",
     cond: CONDITION.includes(input.condition ?? "") ? input.condition : "unknown",

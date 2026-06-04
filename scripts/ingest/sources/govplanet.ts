@@ -117,6 +117,7 @@ export function parseLotsFromHtml(
       url: p.url ?? "",
       lotRef: p.sku,
       sourceName,
+      sourceType: "auction", // GovPlanet results pages are closed/sold lots
     });
   }
   return lots;

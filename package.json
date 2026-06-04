@@ -14,7 +14,7 @@
     "db:migrate": "tsx scripts/migrate.ts",
     "db:seed": "tsx scripts/seed.ts",
     "backtest": "tsx scripts/backtest.ts",
-    "ingest:govplanet": "tsx scripts/ingest/run.ts"
+    "ingest": "tsx scripts/ingest/run.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.68.0",

@@ -1,8 +1,8 @@
 import "dotenv/config";
 import Anthropic from "@anthropic-ai/sdk";
 import { normalizeLot, type NormalizedRow } from "./normalize";
-import { GovPlanetSource } from "./sources/govplanet";
-import type { ClassRef, SourceAdapter } from "./types";
+import { getSource } from "./sources";
+import type { ClassRef } from "./types";
 
 // Scheduled ingestion entry point (run by .github/workflows/ingest.yml).
 // Talks only HTTP: it reads the class list and writes results back through the
@@ -59,7 +59,7 @@ async function main() {
   const appUrl = env("APP_URL").replace(/\/$/, "");
   const maxLots = Number(process.env.MAX_LOTS ?? "50");
 
-  const source: SourceAdapter = new GovPlanetSource();
+  const source = getSource();
   const client = new Anthropic({ apiKey: env("ANTHROPIC_API_KEY") });
   const model = process.env.INGEST_MODEL || "claude-haiku-4-5";
 

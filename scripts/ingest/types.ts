@@ -11,6 +11,10 @@ export interface RawLot {
   url: string; // canonical lot URL, becomes part of the required source note
   lotRef?: string; // auction/lot reference, e.g. "Lot 412"
   sourceName: string; // e.g. "GovPlanet"
+  // How the price should be treated: a realized hammer ("auction") versus a
+  // soft current-bid / listing ("asking"). Sources that only expose closed
+  // results set "auction"; mixed sources set it per lot. Defaults to "auction".
+  sourceType?: "asking" | "auction";
 }
 
 // One source of closed auction results.
