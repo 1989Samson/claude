@@ -78,12 +78,14 @@ async function main() {
 
       let classCount = 0;
       let pointCount = 0;
-      for (const cls of seed.classes) {
+      for (let i = 0; i < seed.classes.length; i++) {
+        const cls = seed.classes[i]!;
         const res = await c.query<{ id: string }>(
           `insert into equipment_class
-             (slug, sector, category, name, unit, ref_rating, ref_spec)
-           values ($1,$2,$3,$4,$5,$6,$7)
+             (slug, seq, sector, category, name, unit, ref_rating, ref_spec)
+           values ($1,$2,$3,$4,$5,$6,$7,$8)
            on conflict (slug) do update set
+             seq = excluded.seq,
              sector = excluded.sector,
              category = excluded.category,
              name = excluded.name,
@@ -93,6 +95,7 @@ async function main() {
            returning id`,
           [
             cls.slug,
+            i,
             cls.sector,
             cls.category,
             cls.name,

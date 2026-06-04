@@ -18,6 +18,7 @@ exception when duplicate_object then null; end $$;
 create table if not exists equipment_class (
   id          uuid primary key default gen_random_uuid(),
   slug        text not null unique,           -- e.g. og_gen_g3516; stable import + test key
+  seq         integer not null default 0,     -- curated display order from the seed
   sector      text not null,
   category    text not null,
   name        text not null,
