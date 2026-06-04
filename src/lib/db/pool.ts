@@ -8,9 +8,11 @@ const globalForPool = globalThis as unknown as { _auricPool?: Pool };
 
 export function getPool(): Pool {
   if (!globalForPool._auricPool) {
-    const connectionString = process.env.DATABASE_URL;
+    // Accept POSTGRES_URL too, so the Vercel Postgres (Neon) integration works
+    // without copying its connection string into a separate variable.
+    const connectionString = process.env.DATABASE_URL ?? process.env.POSTGRES_URL;
     if (!connectionString) {
-      throw new Error("DATABASE_URL is not set");
+      throw new Error("DATABASE_URL (or POSTGRES_URL) is not set");
     }
     globalForPool._auricPool = new Pool({
       connectionString,
