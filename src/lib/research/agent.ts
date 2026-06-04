@@ -101,7 +101,8 @@ export async function researchAsset(
     model,
     max_tokens: 4096,
     system: buildSystemPrompt(input.fxRate),
-    tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 8 }],
+    // Tuned to finish within the Vercel free-tier 60s function ceiling.
+    tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 5 }],
     messages: [
       {
         role: "user",

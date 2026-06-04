@@ -37,6 +37,12 @@ or Vercel, so the steps below are run from your own machine / accounts.
    | `SUPABASE_SERVICE_ROLE_KEY` | the service_role key (server only) |
    | `DATABASE_URL` | the **connection pooler** URL (port 6543, `?pgbouncer=true`) |
    | `INGEST_API_TOKEN` | a long random string |
+   | `ANTHROPIC_API_KEY` | required for the Research Asset tab (web-research agent) |
+   | `RESEARCH_MODEL` | optional, defaults to `claude-sonnet-4-6` |
+
+   The Research Asset agent runs server-side and is tuned to finish within the
+   Vercel free/Hobby 60-second function limit. If you do heavy research and hit
+   timeouts, upgrade to Vercel Pro (300s) or lower the agent's `max_uses`.
 
    Use the pooler URL for `DATABASE_URL` on Vercel: serverless functions open
    many short-lived connections and the pooler prevents exhausting Postgres.

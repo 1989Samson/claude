@@ -6,7 +6,9 @@ import { researchAsset } from "@/lib/research/agent";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 120; // web research can take a while
+// 60s is the Vercel free/Hobby ceiling. Web research usually finishes inside it;
+// heavy research may need Vercel Pro (300s). max_uses on the agent is tuned to fit.
+export const maxDuration = 60;
 
 const bodySchema = z.object({
   description: z.string().trim().min(3),

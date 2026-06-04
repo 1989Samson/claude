@@ -46,6 +46,30 @@ The server talks to Postgres directly via `DATABASE_URL` (the same code path run
 against local Postgres in dev and the Supabase pooler in prod); Supabase JS is
 used for auth.
 
+## Deploy (zero cost)
+
+Everything runs on free tiers: Vercel (Hobby) + Supabase (free) + GitHub Actions.
+The only metered cost is the Claude API for the research agent and ingestion
+(small, pay-per-use). Full detail in DEPLOY.md; the short path:
+
+1. **Supabase (free):** create a project. Either add the **Supabase integration**
+   from the Vercel marketplace (it provisions the DB and injects env vars), or
+   create it manually and copy the URL + anon key + service-role key + the
+   pooler `DATABASE_URL`.
+2. **Schema + seed:** with `DATABASE_URL` pointed at the project, run
+   `npm run db:migrate && npm run db:seed`.
+3. **Vercel:** import this repo (set the production branch to your working
+   branch), and set env vars:
+   `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+   `SUPABASE_SERVICE_ROLE_KEY`, `DATABASE_URL` (pooler), `INGEST_API_TOKEN`,
+   and `ANTHROPIC_API_KEY` (required for the Research Asset tab).
+4. **Auth:** in Supabase, disable public sign-ups and add your team under
+   Authentication > Users.
+5. Deploy. Open the app, sign in, and run an asset through **Research Asset**.
+
+Note: the research agent is tuned to finish inside Vercel Hobby's 60s function
+limit; very heavy research may need Vercel Pro (300s).
+
 ## Develop locally
 
 ```bash
