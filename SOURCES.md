@@ -38,13 +38,41 @@ compliance grounds, not just anti-bot.
 
 ## What is wired now
 
-- **Default source: GSA Auctions** (`scripts/ingest/sources/gsa.ts`), selected by
-  `SOURCE=gsa`. Free and ToS-permissible. It only labels a lot as a realized
-  `auction` price when it carries an award/sale price or closed status; open
-  current bids are imported as `asking`, so nothing masquerades as a sold comp.
-  Coverage of our classes is thin; this keeps the pipeline live and legal.
-- GovPlanet adapter remains in the registry (`SOURCE=govplanet`) but is not the
-  default and should not be used for scheduled scraping per the ToS above.
+`SOURCE` is a comma-separated list of adapters, run in order and aggregated
+(e.g. `SOURCE=govdeals,salvex,gsa`). Each adapter only labels a lot as a realized
+`auction` price when it carries a sale/winning price or a closed status; open
+current bids are imported as `asking`, so nothing masquerades as a sold comp.
+
+- **GSA Auctions** (`sources/gsa.ts`, `SOURCE=gsa`, default): free official API,
+  api.data.gov key. Realized awarded prices, thin coverage of our classes.
+- **GovDeals** (`sources/govdeals.ts`, `SOURCE=govdeals`): government-surplus
+  closed auctions with public winning bids; runs most US state/municipal surplus
+  and a Canadian site. A `govdeals.ca` URL is treated as CAD. Set
+  `GOVDEALS_RESULTS_URLS` to the closed-results endpoint(s).
+- **Salvex** (`sources/salvex.ts`, `SOURCE=salvex`): the most oil-and-gas-relevant
+  source (oilfield equipment, gensets, pumps from bankruptcy/insurance/asset
+  recovery). Prices are often current bids, so most lots normalize as `asking`.
+  Set `SALVEX_RESULTS_URLS`.
+- GovPlanet (`SOURCE=govplanet`) remains in the registry but must not be used for
+  scheduled scraping (RB terms prohibit automated access).
+
+### Legal basis for GovDeals / Salvex
+
+Pulling **publicly-viewable** results (no login) is legally defensible under
+hiQ v. LinkedIn / Van Buren / Meta v. Bright Data: browse-wrap terms you never
+clicked are generally unenforceable, and accessing public data is not CFAA
+"unauthorized access". This differs from the Ritchie Bros family, which both
+prohibits automated access in clickwrap terms and actively blocks. This is a
+defensible gray area, not black-and-white; confirm the firm is comfortable with
+the posture, and do not log in or accept clickwrap terms in the scraper.
+
+### First-run confirmation
+
+The build environment could not reach these sites, so the result URLs and field
+mappings are best-guesses. On the first CI run (use the workflow's dry-run
+input), confirm each adapter returns lots and adjust the `*_RESULTS_URLS` and the
+candidate field-key lists in the adapter if the live JSON/HTML shape differs. The
+parsing logic is unit-tested; only the site-specific wiring needs confirming.
 
 ## Adding EquipmentWatch (the paid upgrade)
 

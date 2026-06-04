@@ -1,8 +1,8 @@
 import "dotenv/config";
 import Anthropic from "@anthropic-ai/sdk";
 import { normalizeLot, type NormalizedRow } from "./normalize";
-import { getSource } from "./sources";
-import type { ClassRef } from "./types";
+import { getSources } from "./sources";
+import type { ClassRef, RawLot } from "./types";
 
 // Scheduled ingestion entry point (run by .github/workflows/ingest.yml).
 // Talks only HTTP: it reads the class list and writes results back through the
@@ -59,15 +59,26 @@ async function main() {
   const appUrl = env("APP_URL").replace(/\/$/, "");
   const maxLots = Number(process.env.MAX_LOTS ?? "50");
 
-  const source = getSource();
+  const sources = getSources();
   const client = new Anthropic({ apiKey: env("ANTHROPIC_API_KEY") });
   const model = process.env.INGEST_MODEL || "claude-haiku-4-5";
 
   const classes = await fetchClasses(appUrl);
   console.log(`Loaded ${classes.length} classes from ${appUrl}`);
 
-  const lots = (await source.fetchRecentLots()).slice(0, maxLots);
-  console.log(`Fetched ${lots.length} lots from ${source.name}`);
+  console.log(`Sources: ${sources.map((s) => s.name).join(", ")}`);
+  let fetched: RawLot[] = [];
+  for (const source of sources) {
+    try {
+      const got = await source.fetchRecentLots();
+      console.log(`  ${source.name}: ${got.length} lots`);
+      fetched.push(...got);
+    } catch (err) {
+      console.warn(`  ${source.name} failed: ${String(err)}`);
+    }
+  }
+  const lots = fetched.slice(0, maxLots);
+  console.log(`Fetched ${lots.length} lots total (capped at ${maxLots})`);
 
   const rows: NormalizedRow[] = [];
   for (const lot of lots) {

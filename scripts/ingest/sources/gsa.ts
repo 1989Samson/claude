@@ -1,3 +1,4 @@
+import { itemsOf, pick, toNumber } from "../parse-util";
 import type { RawLot, SourceAdapter } from "../types";
 
 // GSA Auctions (gsaauctions.gov) public API. Free, ToS-permissible automated
@@ -19,31 +20,6 @@ import type { RawLot, SourceAdapter } from "../types";
 
 const DEFAULT_BASE =
   process.env.GSA_AUCTIONS_URL ?? "https://api.gsa.gov/assets/gsaauctions/v1/auctions";
-
-function pick(obj: Record<string, unknown>, keys: string[]): unknown {
-  for (const k of keys) {
-    if (obj[k] !== undefined && obj[k] !== null && obj[k] !== "") return obj[k];
-  }
-  return undefined;
-}
-
-function toNumber(v: unknown): number | undefined {
-  if (v === undefined || v === null) return undefined;
-  const n = Number(String(v).replace(/[^0-9.]/g, ""));
-  return Number.isFinite(n) && n > 0 ? n : undefined;
-}
-
-// Pull the array of items out of whatever envelope the API returns.
-function itemsOf(json: unknown): Record<string, unknown>[] {
-  if (Array.isArray(json)) return json as Record<string, unknown>[];
-  if (json && typeof json === "object") {
-    for (const key of ["auctions", "items", "results", "data", "Auctions"]) {
-      const v = (json as Record<string, unknown>)[key];
-      if (Array.isArray(v)) return v as Record<string, unknown>[];
-    }
-  }
-  return [];
-}
 
 export function parseGsaItems(json: unknown, sourceName = "GSA Auctions"): RawLot[] {
   const lots: RawLot[] = [];

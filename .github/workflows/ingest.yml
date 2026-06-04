@@ -37,6 +37,8 @@ jobs:
           DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
           INGEST_MODEL: ${{ vars.INGEST_MODEL }}
           GSA_AUCTIONS_URL: ${{ vars.GSA_AUCTIONS_URL }}
+          GOVDEALS_RESULTS_URLS: ${{ vars.GOVDEALS_RESULTS_URLS }}
+          SALVEX_RESULTS_URLS: ${{ vars.SALVEX_RESULTS_URLS }}
           MAX_LOTS: ${{ vars.MAX_LOTS }}
         run: |
           npm run ingest -- ${{ inputs.dry_run && '--dry-run' || '' }}
