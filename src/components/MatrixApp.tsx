@@ -118,7 +118,9 @@ export default function MatrixApp({
           ))}
         </div>
 
-        {tab === "matrix" && <MatrixTab matrix={matrix} />}
+        {tab === "matrix" && (
+          <MatrixTab matrix={matrix} onRefresh={refresh} />
+        )}
         {tab === "value" && (
           <ValuateTab classes={classes} assumptions={assumptions} />
         )}

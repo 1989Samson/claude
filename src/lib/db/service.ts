@@ -1,4 +1,5 @@
 import {
+  backtestClass,
   band,
   confidence,
   confidenceLabel,
@@ -14,7 +15,12 @@ import type {
   ValuateInput,
 } from "@/lib/validation";
 import { importRowSchema } from "@/lib/validation";
-import type { AssumptionsView, ClassMeta, MatrixRow } from "@/lib/types";
+import type {
+  AssumptionsView,
+  BacktestSummary,
+  ClassMeta,
+  MatrixRow,
+} from "@/lib/types";
 import { toAssumptions, toDataPoint } from "./mappers";
 import { query } from "./pool";
 import type { AssumptionsRow, ClassRow, PointRow } from "./rows";
@@ -60,6 +66,7 @@ export async function getMatrix(asOf: string | Date = new Date()): Promise<Matri
   const points = await query<PointRow>(
     `select * from data_point order by created_at asc`,
   );
+  const backtests = await getLatestBacktests();
 
   const byClass = new Map<string, PointRow[]>();
   for (const p of points) {
@@ -76,6 +83,7 @@ export async function getMatrix(asOf: string | Date = new Date()): Promise<Matri
     };
     const b = band(cls, a, asOf);
     const level = confidence(cls, a, asOf);
+    const bt = backtests.get(c.id);
     return {
       ...metaFromRow(c),
       nPoints: ptRows.length,
@@ -88,8 +96,105 @@ export async function getMatrix(asOf: string | Date = new Date()): Promise<Matri
       flv: b?.flv ?? null,
       confidence: level,
       confidenceLabel: confidenceLabel(level),
+      backtestError: bt ? bt.medianAbsPctError : null,
+      backtestN: bt ? bt.nPoints : null,
+      backtestRunDate: bt ? bt.runDate : null,
     };
   });
+}
+
+interface LatestBacktest {
+  nPoints: number;
+  medianAbsPctError: number | null;
+  runDate: string;
+}
+
+// The most recent backtest_run per class.
+export async function getLatestBacktests(): Promise<Map<string, LatestBacktest>> {
+  const rows = await query<{
+    class_id: string;
+    n_points: number;
+    median_abs_pct_error: string | null;
+    run_date: string;
+  }>(
+    `select distinct on (class_id)
+       class_id, n_points, median_abs_pct_error, run_date
+     from backtest_run
+     where class_id is not null
+     order by class_id, run_date desc`,
+  );
+  const map = new Map<string, LatestBacktest>();
+  for (const r of rows) {
+    map.set(r.class_id, {
+      nPoints: r.n_points,
+      medianAbsPctError:
+        r.median_abs_pct_error === null ? null : Number(r.median_abs_pct_error),
+      runDate: r.run_date,
+    });
+  }
+  return map;
+}
+
+// Run the leave-one-out backtest for every class and store one backtest_run per
+// class that has at least one verified sold point evaluated. Classes with no
+// verified sold data are left unscored (no row), so they never claim an error.
+export async function runBacktest(
+  asOf: string | Date = new Date(),
+): Promise<BacktestSummary> {
+  const aRow = await getAssumptionsRow();
+  const a = toAssumptions(aRow);
+  const asOfDate = (asOf instanceof Date ? asOf.toISOString() : asOf).slice(0, 10);
+
+  const classes = await query<ClassRow>(
+    `select * from equipment_class order by seq asc, created_at asc`,
+  );
+  const points = await query<PointRow>(
+    `select * from data_point order by created_at asc`,
+  );
+  const byClass = new Map<string, PointRow[]>();
+  for (const p of points) {
+    const list = byClass.get(p.class_id) ?? [];
+    list.push(p);
+    byClass.set(p.class_id, list);
+  }
+
+  const results: BacktestSummary["results"] = [];
+  let evaluated = 0;
+  for (const c of classes) {
+    const ptRows = byClass.get(c.id) ?? [];
+    const cls: EquipmentClass = {
+      refRating: Number(c.ref_rating),
+      points: ptRows.map(toDataPoint),
+    };
+    const bt = backtestClass(cls, a, asOf);
+    results.push({
+      slug: c.slug,
+      name: c.name,
+      nPoints: bt.nPoints,
+      medianAbsPctError: bt.medianAbsPctError,
+    });
+    if (bt.nPoints > 0) {
+      evaluated++;
+      await query(
+        `insert into backtest_run (as_of, class_id, n_points, median_abs_pct_error, notes)
+         values ($1,$2,$3,$4,$5)`,
+        [
+          asOfDate,
+          c.id,
+          bt.nPoints,
+          bt.medianAbsPctError,
+          "leave-one-out on verified sold points",
+        ],
+      );
+    }
+  }
+
+  return {
+    ranAt: new Date().toISOString(),
+    asOf: asOfDate,
+    classesEvaluated: evaluated,
+    results,
+  };
 }
 
 export async function listClasses(): Promise<ClassMeta[]> {

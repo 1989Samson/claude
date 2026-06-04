@@ -1,6 +1,7 @@
 export * from "./types";
 export * from "./factors";
 export * from "./engine";
+export * from "./backtest";
 
 import type { ConfidenceLevel } from "./types";
 

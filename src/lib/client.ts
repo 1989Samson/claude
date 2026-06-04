@@ -66,6 +66,13 @@ export async function saveAssumptions(
   );
 }
 
+export async function runBacktest(): Promise<{
+  classesEvaluated: number;
+  asOf: string;
+}> {
+  return jsonOrThrow(await fetch("/api/backtest", { method: "POST" }));
+}
+
 export async function valuate(input: {
   classSlug: string;
   rating: number;

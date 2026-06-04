@@ -23,6 +23,22 @@ export interface MatrixRow extends ClassMeta {
   flv: number | null;
   confidence: ConfidenceLevel;
   confidenceLabel: string;
+  // Latest backtest result for the class, null until one has been run.
+  backtestError: number | null; // median absolute percent error (0.18 = 18%)
+  backtestN: number | null; // verified sold points evaluated
+  backtestRunDate: string | null;
+}
+
+export interface BacktestSummary {
+  ranAt: string;
+  asOf: string;
+  classesEvaluated: number; // classes with at least one verified sold point scored
+  results: Array<{
+    slug: string;
+    name: string;
+    nPoints: number;
+    medianAbsPctError: number | null;
+  }>;
 }
 
 export interface AssumptionsView extends AssumptionsInput {

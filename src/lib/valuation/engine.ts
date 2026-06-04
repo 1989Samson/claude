@@ -53,10 +53,24 @@ export function recencyWeight(
   return Math.max(RECENCY_FLOOR, 1 - months / a.recencyHorizonMonths);
 }
 
+// A single point's FMV-equivalent: its implied class FMV at the reference
+// rating. Convert to CAD, scale linearly to the reference rating, divide out the
+// point's own spec multiplier, then rescale to an FMV estimate by source type.
+// This is the per-point quantity that classFMV averages and that the backtest
+// compares against.
+export function pointFmvEq(
+  point: DataPoint,
+  refRating: number,
+  a: Assumptions,
+): number {
+  const m = specMult(point) || 1;
+  const rating = point.rating || refRating;
+  const cadRef = (priceCAD(point, a) / rating) * refRating;
+  return (cadRef / m) * toFmvFactor(point.sourceType, a);
+}
+
 // reference classFMV: weighted mean of each point's FMV-equivalent.
-// Each point is converted to CAD, scaled linearly to the class reference rating,
-// normalized by dividing out its own spec multiplier, then rescaled to an FMV
-// estimate by source type. Weight = source quality * recency.
+// Weight = source quality * recency.
 export function classFMV(
   cls: EquipmentClass,
   a: Assumptions,
@@ -69,10 +83,7 @@ export function classFMV(
   let sold = 0;
 
   for (const p of cls.points) {
-    const m = specMult(p) || 1;
-    const rating = p.rating || cls.refRating;
-    const cadRef = (priceCAD(p, a) / rating) * cls.refRating;
-    const fmvEq = (cadRef / m) * toFmvFactor(p.sourceType, a);
+    const fmvEq = pointFmvEq(p, cls.refRating, a);
     const w = sourceQuality(p.sourceType) * recencyWeight(p, a, asOf);
     weight += w;
     value += fmvEq * w;
