@@ -73,6 +73,38 @@ export async function runBacktest(): Promise<{
   return jsonOrThrow(await fetch("/api/backtest", { method: "POST" }));
 }
 
+export interface ResearchComp {
+  description: string;
+  price: number;
+  currency: "CAD" | "USD";
+  type: string;
+  sourceName: string;
+  url: string;
+  date?: string;
+}
+export interface ResearchResponse {
+  band: { fmvCAD: number; olvCAD: number; flvCAD: number } | null;
+  confidence: "low" | "medium" | "high";
+  comps: ResearchComp[];
+  reasoning: string;
+  caveats: string;
+  persisted?: { imported: number; skipped: number };
+}
+
+export async function researchAsset(input: {
+  description: string;
+  classSlug?: string;
+  persist?: boolean;
+}): Promise<ResearchResponse> {
+  return jsonOrThrow(
+    await fetch("/api/research", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(input),
+    }),
+  );
+}
+
 export async function valuate(input: {
   classSlug: string;
   rating: number;
