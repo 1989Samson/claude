@@ -23,10 +23,12 @@ export default function MatrixApp({
   initialMatrix,
   initialAssumptions,
   classes,
+  userEmail,
 }: {
   initialMatrix: MatrixRow[];
   initialAssumptions: AssumptionsView;
   classes: ClassMeta[];
+  userEmail: string | null;
 }) {
   const [tab, setTab] = useState<TabId>("matrix");
   const [matrix, setMatrix] = useState<MatrixRow[]>(initialMatrix);
@@ -50,11 +52,31 @@ export default function MatrixApp({
 
   return (
     <>
-      <header>
-        <h1>AURIC IRON MATRIX</h1>
-        <span className="tag">
-          Heavy equipment valuation engine &middot; O&amp;G + Mining
-        </span>
+      <header
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+        }}
+      >
+        <div>
+          <h1>AURIC IRON MATRIX</h1>
+          <span className="tag">
+            Heavy equipment valuation engine &middot; O&amp;G + Mining
+          </span>
+        </div>
+        {userEmail && (
+          <form action="/auth/signout" method="post" className="small">
+            <span style={{ marginRight: 10 }}>{userEmail}</span>
+            <button
+              type="submit"
+              className="ghost"
+              style={{ marginTop: 0, padding: "6px 12px" }}
+            >
+              Sign out
+            </button>
+          </form>
+        )}
       </header>
       <div className="wrap">
         <div className="banner">
