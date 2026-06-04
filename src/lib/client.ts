@@ -54,6 +54,18 @@ export async function importPoints(rows: unknown[]): Promise<{
   );
 }
 
+export interface Calibration {
+  askToFmv: number | null;
+  auctionToFmv: number | null;
+  nAsking: number;
+  nAuction: number;
+  nAnchor: number;
+}
+
+export async function getCalibration(): Promise<Calibration> {
+  return jsonOrThrow(await fetch("/api/calibrate", { cache: "no-store" }));
+}
+
 export async function saveAssumptions(
   input: AssumptionsInput,
 ): Promise<AssumptionsView> {

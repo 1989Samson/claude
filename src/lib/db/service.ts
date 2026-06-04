@@ -1,10 +1,12 @@
 import {
   backtestClass,
   band,
+  calibratePooled,
   confidence,
   confidenceLabel,
   isVerifiedSold,
   valuateUnit,
+  type Calibration,
   type EquipmentClass,
   type SourceType,
 } from "@/lib/valuation";
@@ -195,6 +197,26 @@ export async function runBacktest(
     classesEvaluated: evaluated,
     results,
   };
+}
+
+// Fit the asking/auction to FMV factors to the firm's own data, pooled across
+// all classes that hold an FMV anchor (verified non-auction sold points).
+export async function getCalibration(): Promise<Calibration> {
+  const aRow = await getAssumptionsRow();
+  const a = toAssumptions(aRow);
+  const classes = await query<ClassRow>(`select * from equipment_class`);
+  const points = await query<PointRow>(`select * from data_point`);
+  const byClass = new Map<string, PointRow[]>();
+  for (const p of points) {
+    const list = byClass.get(p.class_id) ?? [];
+    list.push(p);
+    byClass.set(p.class_id, list);
+  }
+  const equipmentClasses: EquipmentClass[] = classes.map((c) => ({
+    refRating: Number(c.ref_rating),
+    points: (byClass.get(c.id) ?? []).map(toDataPoint),
+  }));
+  return calibratePooled(equipmentClasses, a);
 }
 
 export async function listClasses(): Promise<ClassMeta[]> {

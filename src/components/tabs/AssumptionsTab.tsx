@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { saveAssumptions } from "@/lib/client";
+import { useEffect, useState } from "react";
+import { getCalibration, saveAssumptions, type Calibration } from "@/lib/client";
 import type { AssumptionsView } from "@/lib/types";
 
 export default function AssumptionsTab({
@@ -23,6 +23,13 @@ export default function AssumptionsTab({
   );
   const [msg, setMsg] = useState<{ text: string; warn?: boolean } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [cal, setCal] = useState<Calibration | null>(null);
+
+  useEffect(() => {
+    getCalibration()
+      .then(setCal)
+      .catch(() => setCal(null));
+  }, []);
 
   async function save() {
     setMsg(null);
@@ -51,6 +58,47 @@ export default function AssumptionsTab({
         Every assumption is visible and editable. Provenance is flagged. Change
         one and the whole matrix recomputes.
       </div>
+
+      {cal && (cal.askToFmv !== null || cal.auctionToFmv !== null) && (
+        <div className="result" style={{ marginBottom: 16 }}>
+          <b style={{ color: "var(--gold)" }}>Calibrated from your data.</b>{" "}
+          <span className="small">
+            Fitted from {cal.nAnchor} verified sold anchor(s).
+          </span>
+          <div className="small" style={{ marginTop: 8 }}>
+            {cal.askToFmv !== null && (
+              <div style={{ marginBottom: 6 }}>
+                Asking to FMV: <b>{cal.askToFmv.toFixed(3)}</b> (n={cal.nAsking},
+                current {askToFmv}){" "}
+                <button
+                  className="ghost"
+                  style={{ marginTop: 0, padding: "4px 10px" }}
+                  onClick={() => setAskToFmv(cal.askToFmv!.toFixed(3))}
+                >
+                  Use
+                </button>
+              </div>
+            )}
+            {cal.auctionToFmv !== null && (
+              <div>
+                Auction to FMV: <b>{cal.auctionToFmv.toFixed(3)}</b> (n=
+                {cal.nAuction}, current {auctionToFmv}){" "}
+                <button
+                  className="ghost"
+                  style={{ marginTop: 0, padding: "4px 10px" }}
+                  onClick={() => setAuctionToFmv(cal.auctionToFmv!.toFixed(3))}
+                >
+                  Use
+                </button>
+              </div>
+            )}
+            <div style={{ marginTop: 6 }}>
+              Click Use, then Save assumptions to apply. The defaults stay until
+              you do.
+            </div>
+          </div>
+        </div>
+      )}
       <label>USD to CAD rate</label>
       <input
         type="number"
