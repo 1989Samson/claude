@@ -88,11 +88,13 @@ export async function findSupply(
   input: FindSupplyInput,
   deps: FindSupplyDeps,
 ): Promise<SupplyCandidate[]> {
-  const model = deps.model ?? process.env.RESEARCH_MODEL ?? "claude-sonnet-4-6";
+  // Haiku by default: this is find-and-extract work, not heavy reasoning, and it
+  // cuts per-search cost ~3x versus Sonnet. Override with SUPPLY_MODEL.
+  const model = deps.model ?? process.env.SUPPLY_MODEL ?? "claude-haiku-4-5";
 
   const message = await deps.client.messages.create({
     model,
-    max_tokens: 8000,
+    max_tokens: 4000,
     system: buildSupplyPrompt(input),
     tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 4 }],
     messages: [

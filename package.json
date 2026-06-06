@@ -1,8 +1,8 @@
 {
-  "name": "auric-iron-matrix",
+  "name": "auric-axis-sourcing",
   "version": "0.1.0",
   "private": true,
-  "description": "Auric Iron Matrix - heavy equipment valuation engine for distressed-asset work",
+  "description": "Auric Axis - equipment sourcing for mine restarts: build the equipment universe, hunt the live market for available used units nearest first.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,11 +10,7 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "db:migrate": "tsx scripts/migrate.ts",
-    "db:seed": "tsx scripts/seed.ts",
-    "backtest": "tsx scripts/backtest.ts",
-    "ingest": "tsx scripts/ingest/run.ts"
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.68.0",
