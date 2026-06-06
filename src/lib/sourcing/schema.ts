@@ -49,10 +49,31 @@ export const supplyCandidateSchema = z.object({
   priceText: z.string().optional(), // often "call for price"
   currency: z.enum(["CAD", "USD"]).optional(),
   location: z.string().optional(),
+  tier: z.string().optional(), // local | regional | national | international
   condition: z.string().optional(),
   sourceName: z.string().min(1),
   url: z.string().url(),
   notes: z.string().optional(),
 });
 export type SupplyCandidate = z.infer<typeof supplyCandidateSchema>;
+
+// A line in a restart's equipment demand universe. Lenient on enums so we never
+// drop a real item the model returns over a category typo.
+export const demandItemSchema = z.object({
+  item: z.string().min(1),
+  category: z.string().optional(),
+  sizeSpec: z.string().optional(),
+  usedSuitability: z.string().optional(), // high | medium | low
+  targetModels: z.array(z.string()).optional(),
+  priority: z.string().optional(),
+  notes: z.string().optional(),
+});
+export type DemandItem = z.infer<typeof demandItemSchema>;
+
+export interface DemandUniverse {
+  project: string;
+  location?: string;
+  items: DemandItem[];
+}
+
 

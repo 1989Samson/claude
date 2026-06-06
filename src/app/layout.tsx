@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Auric Iron Matrix",
+  title: "Auric Axis - Equipment Sourcing",
   description:
-    "Heavy equipment valuation engine for oil and gas and mining distressed-asset work.",
+    "Build the equipment universe a mine restart needs, then hunt the live market for every available used unit, nearest first.",
 };
 
 export default function RootLayout({
