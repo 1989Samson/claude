@@ -23,7 +23,7 @@ export async function POST(req: Request) {
       );
     }
     const input = bodySchema.parse(await req.json());
-    const client = new Anthropic({ apiKey });
+    const client = new Anthropic({ apiKey, maxRetries: 5 });
     const universe = await buildUniverse(input, { client });
     return ok(universe);
   });

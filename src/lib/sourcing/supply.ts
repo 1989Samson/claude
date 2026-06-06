@@ -96,7 +96,9 @@ export async function findSupply(
     model,
     max_tokens: 4000,
     system: buildSupplyPrompt(input),
-    tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 4 }],
+    // 2 searches keeps input-token use (and rate-limit pressure) low; web search
+    // ingests a lot of tokens per query.
+    tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 2 }],
     messages: [
       {
         role: "user",

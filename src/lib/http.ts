@@ -29,6 +29,18 @@ export async function handle(
     if (err instanceof ZodError) {
       return badRequest("Validation failed", err.issues);
     }
+    const status = (err as { status?: number })?.status;
+    const message = err instanceof Error ? err.message : "";
+    if (status === 429 || /rate[_ ]?limit/i.test(message)) {
+      return NextResponse.json(
+        {
+          error:
+            "Anthropic rate limit reached. Your account is on a low usage tier - it will retry; for full-speed runs raise your tier in the Anthropic console.",
+          code: "rate_limit",
+        },
+        { status: 429 },
+      );
+    }
     return serverError(err);
   }
 }

@@ -84,25 +84,23 @@ export default function SourcingApp() {
     }
   }
 
-  // Run every line, 3 at a time, so the whole universe fills in without
-  // hammering the server or blowing any single request's time budget.
+  // Run every line ONE AT A TIME. Anthropic's low usage tiers cap input tokens
+  // per minute, and web search ingests a lot; serial + server-side retry keeps
+  // it under the cap instead of erroring out.
   async function huntAll() {
     if (!items) return;
     setRunningAll(true);
-    const queue = items.map((item, idx) => ({ item, idx }));
-    const workers = Array.from({ length: 3 }, async () => {
-      while (queue.length) {
-        const next = queue.shift();
-        if (!next) break;
-        await hunt(next.idx, next.item);
-      }
-    });
-    await Promise.all(workers);
+    for (let idx = 0; idx < items.length; idx++) {
+      await hunt(idx, items[idx]!);
+    }
     setRunningAll(false);
   }
 
   const grouped = groupByCategory(items ?? []);
   const doneCount = Object.values(supply).filter((s) => s.status === "done").length;
+  const rateLimited = Object.values(supply).some((s) =>
+    /rate limit/i.test(s.error ?? ""),
+  );
 
   return (
     <>
@@ -149,6 +147,19 @@ export default function SourcingApp() {
               </button>{" "}
               <span className="small">or hunt any single line below</span>
             </div>
+
+            {rateLimited && (
+              <div className="banner" style={{ marginBottom: 14 }}>
+                <b>Anthropic rate limit hit.</b> Your account is on a low usage
+                tier (50k input tokens/min) and web search uses a lot. The app
+                retries automatically, so single hunts still work - just pace
+                them. For full-speed "find all", raise your tier at{" "}
+                <a href="https://console.anthropic.com/settings/limits" target="_blank" rel="noreferrer">
+                  console.anthropic.com/settings/limits
+                </a>
+                .
+              </div>
+            )}
 
             {grouped.map(([cat, list]) => (
               <div key={cat} style={{ marginBottom: 10 }}>
