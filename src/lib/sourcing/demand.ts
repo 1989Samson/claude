@@ -53,11 +53,14 @@ export async function buildUniverse(
   input: BuildUniverseInput,
   deps: BuildUniverseDeps,
 ): Promise<DemandUniverse> {
-  const model = deps.model ?? process.env.RESEARCH_MODEL ?? "claude-sonnet-4-6";
+  // Haiku by default: generating an equipment checklist is fast domain recall,
+  // not deep reasoning. Far quicker (avoids timeouts) and cheaper. Override with
+  // UNIVERSE_MODEL.
+  const model = deps.model ?? process.env.UNIVERSE_MODEL ?? "claude-haiku-4-5";
 
   const message = await deps.client.messages.create({
     model,
-    max_tokens: 8000,
+    max_tokens: 4000,
     system: buildUniversePrompt(),
     messages: [
       {

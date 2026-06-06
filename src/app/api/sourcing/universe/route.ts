@@ -5,7 +5,7 @@ import { buildUniverse } from "@/lib/sourcing/demand";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 const bodySchema = z.object({
   project: z.string().trim().min(2),
