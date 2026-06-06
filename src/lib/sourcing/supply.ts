@@ -3,7 +3,6 @@
 // edge - supply omniscience + speed. The Anthropic client is injected so the
 // logic is unit-testable without a key; live runs use web search on deploy.
 
-import { extractJson } from "@/lib/research/agent";
 import { supplyCandidateSchema, type SupplyCandidate } from "./schema";
 
 export interface SupplyClient {
@@ -72,6 +71,58 @@ export function sanitizeCandidates(raw: unknown[]): SupplyCandidate[] {
   return out;
 }
 
+// Robustly pull candidate objects out of the model's text. We brace-match and
+// JSON.parse each object individually, so a missing comma, stray token, or a
+// truncated final object does NOT throw away the whole result (the strict
+// approach was failing the entire run on one formatting glitch).
+export function parseCandidatesLoose(text: string): unknown[] {
+  const key = text.indexOf('"candidates"');
+  const start = text.indexOf("[", key === -1 ? 0 : key);
+  if (start === -1) return [];
+
+  const out: unknown[] = [];
+  let i = start + 1;
+  while (i < text.length) {
+    while (i < text.length && /[\s,]/.test(text[i]!)) i++; // skip whitespace/commas
+    if (i >= text.length || text[i] === "]") break;
+    if (text[i] !== "{") {
+      // stray token between objects: jump to the next object if there is one
+      const next = text.indexOf("{", i);
+      if (next === -1) break;
+      i = next;
+    }
+    // brace-match one object, respecting strings/escapes
+    let depth = 0;
+    let j = i;
+    let inStr = false;
+    let esc = false;
+    for (; j < text.length; j++) {
+      const ch = text[j]!;
+      if (inStr) {
+        if (esc) esc = false;
+        else if (ch === "\\") esc = true;
+        else if (ch === '"') inStr = false;
+      } else if (ch === '"') inStr = true;
+      else if (ch === "{") depth++;
+      else if (ch === "}") {
+        depth--;
+        if (depth === 0) {
+          j++;
+          break;
+        }
+      }
+    }
+    if (depth !== 0) break; // truncated final object: keep what we have
+    try {
+      out.push(JSON.parse(text.slice(i, j)));
+    } catch {
+      /* skip a malformed object, keep the rest */
+    }
+    i = j;
+  }
+  return out;
+}
+
 export async function findSupply(
   input: FindSupplyInput,
   deps: FindSupplyDeps,
@@ -80,18 +131,17 @@ export async function findSupply(
 
   const message = await deps.client.messages.create({
     model,
-    max_tokens: 3000,
+    max_tokens: 6000,
     system: buildSupplyPrompt(input),
     // 3 searches keeps the run comfortably inside the function time limit.
     tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 3 }],
     messages: [
       {
         role: "user",
-        content: `Find available units now for: ${input.item}${input.sizeSpec ? ` (${input.sizeSpec})` : ""}. Return the JSON.`,
+        content: `Find available units now for: ${input.item}${input.sizeSpec ? ` (${input.sizeSpec})` : ""}. Return at most 8 of the best, as the JSON object.`,
       },
     ],
   });
 
-  const parsed = extractJson(textOf(message.content)) as { candidates?: unknown[] };
-  return sanitizeCandidates(Array.isArray(parsed?.candidates) ? parsed.candidates : []);
+  return sanitizeCandidates(parseCandidatesLoose(textOf(message.content)));
 }

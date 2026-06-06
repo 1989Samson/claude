@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { buildSupplyPrompt, findSupply, sanitizeCandidates, type SupplyClient } from "../supply";
+import { buildSupplyPrompt, findSupply, parseCandidatesLoose, sanitizeCandidates, type SupplyClient } from "../supply";
 
 function fakeClient(jsonText: string): SupplyClient {
   return {
@@ -43,6 +43,27 @@ describe("sanitizeCandidates", () => {
     ]);
     expect(out).toHaveLength(1);
     expect(out[0]!.model).toBe("R1700G");
+  });
+});
+
+describe("parseCandidatesLoose", () => {
+  it("recovers candidates despite a missing comma between objects (the real bug)", () => {
+    const text = `Here are results: {"candidates":[
+      {"description":"A","sourceName":"X","url":"https://x.com/1"}
+      {"description":"B","sourceName":"Y","url":"https://y.com/2"}
+    ]}`;
+    const out = parseCandidatesLoose(text);
+    expect(out).toHaveLength(2);
+  });
+
+  it("keeps complete candidates even if the last one is truncated", () => {
+    const text = `{"candidates":[{"description":"A","sourceName":"X","url":"https://x.com/1"},{"description":"B trunc`;
+    expect(parseCandidatesLoose(text)).toHaveLength(1);
+  });
+
+  it("handles fenced json and empty arrays", () => {
+    expect(parseCandidatesLoose('```json\n{"candidates":[]}\n```')).toHaveLength(0);
+    expect(parseCandidatesLoose("no json")).toEqual([]);
   });
 });
 
