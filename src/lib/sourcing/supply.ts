@@ -96,11 +96,12 @@ export async function findSupply(
 
   const message = await deps.client.messages.create({
     model,
-    max_tokens: 6000,
+    max_tokens: 5000,
     system: buildSupplyPrompt(input),
-    // 3 web searches: enough to actually find listings, while keeping input
-    // tokens (rate-limit pressure) in check.
-    tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 3 }],
+    // 2 searches: best balance for a low-tier account - enough for Sonnet to
+    // find and cite units, while keeping input tokens under the per-minute cap
+    // so a single hunt completes instead of 429-looping into a timeout.
+    tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 2 }],
     messages: [
       {
         role: "user",
