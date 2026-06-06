@@ -88,17 +88,19 @@ export async function findSupply(
   input: FindSupplyInput,
   deps: FindSupplyDeps,
 ): Promise<SupplyCandidate[]> {
-  // Haiku by default: this is find-and-extract work, not heavy reasoning, and it
-  // cuts per-search cost ~3x versus Sonnet. Override with SUPPLY_MODEL.
-  const model = deps.model ?? process.env.SUPPLY_MODEL ?? "claude-haiku-4-5";
+  // Sonnet: Haiku was too weak here - it returned units without clean source
+  // URLs (dropped by the cite-or-shut-up guard) and searched less effectively,
+  // yielding "no cited units". Sonnet reliably finds and cites. Override with
+  // SUPPLY_MODEL if you want to trade quality for cost.
+  const model = deps.model ?? process.env.SUPPLY_MODEL ?? "claude-sonnet-4-6";
 
   const message = await deps.client.messages.create({
     model,
-    max_tokens: 4000,
+    max_tokens: 6000,
     system: buildSupplyPrompt(input),
-    // 2 searches keeps input-token use (and rate-limit pressure) low; web search
-    // ingests a lot of tokens per query.
-    tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 2 }],
+    // 3 web searches: enough to actually find listings, while keeping input
+    // tokens (rate-limit pressure) in check.
+    tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 3 }],
     messages: [
       {
         role: "user",
