@@ -5,7 +5,7 @@ import { findSupply } from "@/lib/sourcing/supply";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 60; // web search; Vercel Hobby ceiling
+export const maxDuration = 300; // web search can be slow; Pro allows up to 300s
 
 const bodySchema = z.object({
   item: z.string().trim().min(2),

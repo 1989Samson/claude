@@ -80,9 +80,10 @@ export async function findSupply(
 
   const message = await deps.client.messages.create({
     model,
-    max_tokens: 4096,
+    max_tokens: 3000,
     system: buildSupplyPrompt(input),
-    tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 5 }],
+    // 3 searches keeps the run comfortably inside the function time limit.
+    tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 3 }],
     messages: [
       {
         role: "user",

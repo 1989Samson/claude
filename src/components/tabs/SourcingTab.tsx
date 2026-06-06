@@ -48,7 +48,12 @@ export default function SourcingTab() {
       const res = await findSupply(q);
       setCandidates(res.candidates);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Supply search failed");
+      const msg = e instanceof Error ? e.message : "Supply search failed";
+      setError(
+        /failed to fetch|networkerror|load failed/i.test(msg)
+          ? "The search timed out or the connection dropped. Give it another try, or narrow the spec/models."
+          : msg,
+      );
     } finally {
       setBusy(false);
     }
