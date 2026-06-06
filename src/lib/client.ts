@@ -117,6 +117,36 @@ export async function researchAsset(input: {
   );
 }
 
+export interface SupplyCandidate {
+  description: string;
+  make?: string;
+  model?: string;
+  year?: number;
+  hours?: number;
+  priceText?: string;
+  currency?: "CAD" | "USD";
+  location?: string;
+  condition?: string;
+  sourceName: string;
+  url: string;
+  notes?: string;
+}
+
+export async function findSupply(input: {
+  item: string;
+  sizeSpec?: string;
+  targetModels?: string[];
+  region?: string;
+}): Promise<{ candidates: SupplyCandidate[] }> {
+  return jsonOrThrow(
+    await fetch("/api/sourcing/find", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(input),
+    }),
+  );
+}
+
 export async function valuate(input: {
   classSlug: string;
   rating: number;

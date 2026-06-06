@@ -8,10 +8,12 @@ import AssumptionsTab from "./tabs/AssumptionsTab";
 import MatrixTab from "./tabs/MatrixTab";
 import MethodTab from "./tabs/MethodTab";
 import ResearchTab from "./tabs/ResearchTab";
+import SourcingTab from "./tabs/SourcingTab";
 import ValuateTab from "./tabs/ValuateTab";
 
 const TABS = [
   { id: "matrix", label: "Matrix" },
+  { id: "sourcing", label: "Sourcing" },
   { id: "research", label: "Research Asset" },
   { id: "value", label: "Valuate Unit" },
   { id: "add", label: "Add Data Point" },
@@ -145,6 +147,7 @@ export default function MatrixApp({
         {tab === "matrix" && (
           <MatrixTab matrix={matrix} onRefresh={refresh} />
         )}
+        {tab === "sourcing" && <SourcingTab />}
         {tab === "research" && (
           <ResearchTab classes={classes} onChanged={refresh} />
         )}

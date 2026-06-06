@@ -35,3 +35,24 @@ export const sourcingSheetSchema = z.object({
   items: z.array(sourcingItemSchema),
 });
 export type SourcingSheet = z.infer<typeof sourcingSheetSchema>;
+
+// A real available unit found on the market for a given need. Every candidate
+// must carry a source URL the agent actually retrieved (cite-or-shut-up): a
+// listing with no source is dropped, never shown. This is the supply half of the
+// engine: the "get it best and fastest" edge.
+export const supplyCandidateSchema = z.object({
+  description: z.string().min(1),
+  make: z.string().optional(),
+  model: z.string().optional(),
+  year: z.number().int().optional(),
+  hours: z.number().optional(),
+  priceText: z.string().optional(), // often "call for price"
+  currency: z.enum(["CAD", "USD"]).optional(),
+  location: z.string().optional(),
+  condition: z.string().optional(),
+  sourceName: z.string().min(1),
+  url: z.string().url(),
+  notes: z.string().optional(),
+});
+export type SupplyCandidate = z.infer<typeof supplyCandidateSchema>;
+
