@@ -246,11 +246,26 @@ export function estimate(unit: UnitInput, dest: DestRegion): EstimateResult {
   const weeksLo = prepWk + oceanWk + customsWk + permitWk + haulWk;
   const weeksHi = weeksLo + 3;
 
+  // Precision signal: the engine states what it does not know. Real weights in
+  // both fields collapse the band; class defaults leave it wide.
+  const weightsBasis =
+    unit.totalT != null && unit.pieceT != null ? "spec sheet" : "class default";
+  const spreadRatio = logistics[0] > 0 ? logistics[1] / logistics[0] : 0;
+  const confidence = {
+    weightsBasis: weightsBasis as "class default" | "spec sheet",
+    spreadRatio: Math.round(spreadRatio * 100) / 100,
+    note:
+      weightsBasis === "spec sheet"
+        ? "Directional, on real spec-sheet weights. Confirm the HS line and route before quoting."
+        : "Directional, on class-default weights. Enter real total and piece weights to tighten the band.",
+  };
+
   const internal: InternalEstimate = {
     model: unit.model,
     cls: unit.cls as TransportClass,
     corridor: corr.entry,
     weightsT: { total: totalT, largestPiece: pieceT },
+    confidence,
     stackUsd: stack,
     logisticsUsd: band(logistics[0], logistics[1]),
     taxesUsd: band(taxesTotal[0], taxesTotal[1]),

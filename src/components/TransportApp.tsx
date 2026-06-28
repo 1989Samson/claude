@@ -209,6 +209,13 @@ function Output({ result, showStack, onToggle }: { result: EstimateResult; showS
       <h3 style={{ fontSize: 15, marginBottom: 6 }}>3. Buyer view</h3>
       <BuyerView buyer={buyer!} />
 
+      <div className="small" style={{ marginTop: 10 }}>
+        <span className={"pill " + (internal.confidence.weightsBasis === "spec sheet" ? "c-med" : "c-none")} style={{ marginRight: 8 }}>
+          {internal.confidence.weightsBasis === "spec sheet" ? "real weights" : "default weights"}
+        </span>
+        {internal.confidence.note} Band spread {internal.confidence.spreadRatio}x.
+      </div>
+
       <div style={{ marginTop: 16 }}>
         <button className="ghost" style={{ marginTop: 0 }} onClick={onToggle}>
           {showStack ? "Hide internal cost stack" : "Show internal cost stack"}

@@ -43,11 +43,22 @@ export type Band = [number, number];
 
 // The internal cost stack: the real landed logistics number plus recoverable
 // taxes, for building your quote. Yours, never shown raw to a buyer.
+// How the estimate knows what it does not know. Weights drive the largest swings
+// in the stack, so whether they are real spec-sheet figures or class defaults is
+// the honest precision signal. spreadRatio is logistics high / low: the wider it
+// is, the coarser the number.
+export interface Confidence {
+  weightsBasis: "class default" | "spec sheet";
+  spreadRatio: number;
+  note: string;
+}
+
 export interface InternalEstimate {
   model: string;
   cls: TransportClass;
   corridor: string;
   weightsT: { total: number; largestPiece: number };
+  confidence: Confidence;
   stackUsd: Record<string, Band>;
   logisticsUsd: Band;
   taxesUsd: Band;

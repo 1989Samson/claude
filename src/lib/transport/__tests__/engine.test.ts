@@ -88,6 +88,16 @@ describe("estimate - parity with the Python prototype", () => {
     expect(buyer).toBeNull();
   });
 
+  it("exposes its own precision: class default vs spec-sheet weights", () => {
+    const base = { model: "x", cls: "B", origin: "US", valueUsd: 6_000_000 } as const;
+    const dflt = estimate(unit(base), "AB").internal;
+    const real = estimate(unit({ ...base, totalT: 150, pieceT: 60 }), "AB").internal;
+    if (isInfeasible(dflt) || isInfeasible(real)) throw new Error("should be feasible");
+    expect(dflt.confidence.weightsBasis).toBe("class default");
+    expect(real.confidence.weightsBasis).toBe("spec sheet");
+    expect(dflt.confidence.spreadRatio).toBeGreaterThan(1);
+  });
+
   it("buyer band never carries the precise internal logistics figure", () => {
     const { internal, buyer } = estimate(
       unit({ model: "x", cls: "B", origin: "AE", valueUsd: 6_000_000 }),
