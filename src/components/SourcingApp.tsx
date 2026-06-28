@@ -103,12 +103,7 @@ export default function SourcingApp() {
   );
 
   return (
-    <>
-      <header>
-        <h1>AURIC AXIS</h1>
-        <span className="tag">Equipment sourcing &middot; mine restarts</span>
-      </header>
-      <div className="wrap">
+    <div className="wrap">
         <div className="note">
           Build the complete equipment universe a restart needs, then hunt the live
           market for every available used or rebuilt unit, nearest the site first,
@@ -205,8 +200,7 @@ export default function SourcingApp() {
             No equipment list came back. Try adding a bit more detail and rebuild.
           </div>
         )}
-      </div>
-    </>
+    </div>
   );
 }
 

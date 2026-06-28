@@ -1,6 +1,9 @@
 # Auric Axis - Equipment Sourcing
 
 A focused tool for sourcing heavy equipment for mine restarts and expansions.
+Two tabs:
+
+## Sourcing
 
 1. **Build the equipment universe** - describe a mine/restart (name, location,
    scope) and it produces the complete equipment list the project needs: plant,
@@ -10,6 +13,23 @@ A focused tool for sourcing heavy equipment for mine restarts and expansions.
    first**, each with a source link, deduped and sorted local to international.
 
 The output is the map; you work the reps and win the spread.
+
+## Transport
+
+Delivered-cost and time-to-site estimator for moving 60 Hz generation iron from
+a global source into a Canadian build. Given a unit (class, origin, value,
+weights) and a destination province, it returns a **two-tier** result:
+
+- a **buyer view**, a deliberately coarse logistics band plus weeks-to-site,
+  rounded hard so a buyer cannot back into your margin, and
+- an **internal cost stack** on request, the real landed logistics number plus
+  the recoverable tax line, for building your quote.
+
+The engine is a faithful TypeScript port of the `transport_estimator.py`
+prototype (v2). It is **pure and deterministic**: it runs in the browser, so it
+needs no API key, has no rate limit, and costs nothing. It never invents a
+number, every figure falls out of the unit, the corridor, and the editable rate
+tables. The reference spec and prototype live in `docs/transport/`.
 
 ## Stack
 
@@ -39,8 +59,14 @@ prepaid, so spend is hard-capped. Override the model with `SUPPLY_MODEL` /
 
 ## Layout
 
-- `src/components/SourcingApp.tsx` - the single-page UI.
+- `src/components/AppShell.tsx` - header plus the Sourcing / Transport tabs.
+- `src/components/SourcingApp.tsx` - the sourcing UI.
+- `src/components/TransportApp.tsx` - the transport calculator UI.
 - `src/lib/sourcing/demand.ts` - equipment-universe generator.
 - `src/lib/sourcing/supply.ts` - geo-tiered supply hunt.
 - `src/lib/sourcing/parse.ts` - tolerant JSON extraction.
 - `src/app/api/sourcing/{universe,find}` - the two endpoints.
+- `src/lib/transport/engine.ts` - the delivered-cost engine (pure, no API).
+- `src/lib/transport/rates.json` - editable, versioned rate tables.
+- `src/lib/transport/schema.ts` - transport types and zod schemas.
+- `docs/transport/` - the reference spec and Python prototype.

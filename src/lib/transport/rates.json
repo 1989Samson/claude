@@ -1,0 +1,89 @@
+{
+  "version": "v2",
+  "asOf": "2026-06",
+  "currency": "USD (Canadian legs are CAD in reality; add FX per line in the build)",
+  "note": "Editable rate tables for the transport engine. Benchmarks verified June 2026. Treat every rate as a number that moves; update here, not in code, and bump version + asOf.",
+
+  "inland_usd_per_mile": {
+    "legal": [3.0, 4.5],
+    "oversize": [4.5, 8.0],
+    "superload": [5.0, 15.0]
+  },
+  "short_haul_miles": 200,
+  "short_haul_mult": 1.5,
+  "winter_surcharge": 0.125,
+
+  "pilot_usd_per_mile": 1.75,
+  "police_usd_per_hour": 110,
+  "police_min_hours": 6,
+
+  "permit_oversize": [100, 400],
+  "permit_superload": [500, 5000],
+
+  "ocean_usd_per_rt": [45, 120],
+  "flat_rack_max_tonnes": 55,
+  "flat_rack_discount": 0.75,
+  "gulf_lane_surcharge": 0.15,
+  "heavy_lift_piece_t": 50,
+  "heavy_lift_usd_per_t": [300, 1200],
+  "charter_flag_piece_t": 120,
+
+  "marine_insurance": [0.001, 0.005],
+
+  "port_handling": {
+    "A": [2000, 8000],
+    "B": [8000, 30000],
+    "C": [20000, 60000],
+    "D": [0, 0]
+  },
+  "crane_usd_per_day": {
+    "A": [3000, 8000],
+    "B": [8000, 20000],
+    "C": [15000, 40000],
+    "D": [0, 0]
+  },
+  "rig_days": { "A": 1, "B": 2, "C": 3, "D": 0 },
+  "origin_prep": {
+    "A": [5000, 25000],
+    "B": [30000, 120000],
+    "C": [60000, 200000],
+    "D": [50000, 150000]
+  },
+
+  "duty_rate_turbine": 0.0,
+  "duty_rate_genset": 0.0,
+  "gst": 0.05,
+  "provincial_tax": {
+    "AB": 0.0,
+    "BC": 0.07,
+    "ON": 0.08,
+    "QC": 0.09975,
+    "SK": 0.06,
+    "MB": 0.07
+  },
+
+  "class_weight": {
+    "A": [55, 45],
+    "B": [180, 90],
+    "C": [300, 140],
+    "D": [0, 0]
+  },
+  "class_load": { "A": "oversize", "B": "oversize", "C": "superload", "D": "legal" },
+  "class_pilots": { "A": 1, "B": 1, "C": 2, "D": 0 },
+  "prep_weeks": { "A": 2, "B": 5, "C": 7, "D": 6 },
+
+  "corridors": {
+    "US>AB": { "entry": "overland (Pacific NW / Houston corridor)", "ocean_days": 0, "inland_miles": 1300, "jurisdictions": 6 },
+    "US>ON": { "entry": "overland (Great Lakes / NE corridor)", "ocean_days": 0, "inland_miles": 700, "jurisdictions": 4 },
+    "US>QC": { "entry": "overland (NE corridor)", "ocean_days": 0, "inland_miles": 600, "jurisdictions": 4 },
+    "SA>AB": { "entry": "ocean to Houston, then overland", "ocean_days": 30, "inland_miles": 2400, "jurisdictions": 8 },
+    "SA>ON": { "entry": "ocean via Suez to Montreal", "ocean_days": 28, "inland_miles": 340, "jurisdictions": 2 },
+    "SA>QC": { "entry": "ocean via Suez to Montreal", "ocean_days": 28, "inland_miles": 80, "jurisdictions": 1 },
+    "AE>AB": { "entry": "ocean to Vancouver (Pacific), then overland", "ocean_days": 33, "inland_miles": 650, "jurisdictions": 3 },
+    "AE>ON": { "entry": "ocean via Suez to Montreal", "ocean_days": 29, "inland_miles": 340, "jurisdictions": 2 },
+    "AE>QC": { "entry": "ocean via Suez to Montreal", "ocean_days": 29, "inland_miles": 80, "jurisdictions": 1 },
+    "JP>AB": { "entry": "ocean to Prince Rupert, then CN rail / road", "ocean_days": 11, "inland_miles": 900, "jurisdictions": 2 },
+    "JP>ON": { "entry": "ocean to Vancouver, then land bridge", "ocean_days": 12, "inland_miles": 2800, "jurisdictions": 4 },
+    "JP>QC": { "entry": "ocean to Vancouver, then land bridge", "ocean_days": 12, "inland_miles": 2950, "jurisdictions": 5 }
+  }
+}
