@@ -1,0 +1,15 @@
+[
+  {
+    "id": "seed-example-genset",
+    "model": "Example containerized gas genset (replace me)",
+    "cls": "A",
+    "mw": 2.5,
+    "origin": "US",
+    "valueUsd": 1200000,
+    "madeIn": "DE",
+    "status": "watch",
+    "sourceNote": "Seed row showing the shape. Edit or delete. sourceNote stays internal, never shown to a buyer.",
+    "addedOn": "2026-06-30",
+    "notes": "Add real units here as supply firms up. Each row can be run through the transport engine on the internal desk."
+  }
+]

@@ -298,3 +298,110 @@ button:disabled {
   color: var(--ink2);
   margin-top: 4px;
 }
+
+/* ---- public Time to Power wedge ---- */
+.hero {
+  border-bottom: 2px solid var(--gold);
+  padding: 30px 22px 26px;
+}
+.hero .brand {
+  font-family: Georgia, serif;
+  font-size: 20px;
+  letter-spacing: 0.5px;
+}
+.hero .lede {
+  font-family: Georgia, serif;
+  font-size: 26px;
+  line-height: 1.25;
+  margin-top: 14px;
+  max-width: 760px;
+}
+.hero .sub {
+  color: var(--ink2);
+  font-size: 13px;
+  margin-top: 12px;
+  max-width: 680px;
+}
+.eyebrow {
+  color: var(--gold);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 700;
+}
+.gap {
+  background: var(--panel);
+  border-left: 3px solid var(--gold);
+  padding: 16px 18px;
+  margin: 18px 0;
+}
+.gap h4 {
+  font-family: Georgia, serif;
+  font-size: 18px;
+  margin: 6px 0 8px;
+}
+.gap p {
+  margin: 0;
+  color: var(--ink2);
+  font-size: 13px;
+}
+.gap .stance {
+  color: var(--ink);
+  margin-top: 10px;
+  font-size: 13px;
+}
+.opt {
+  border: 1px solid var(--line2);
+  border-radius: 4px;
+  padding: 16px 18px;
+  background: var(--panel);
+}
+.opt.rec {
+  border-color: var(--gold);
+}
+.opt h4 {
+  font-family: Georgia, serif;
+  font-size: 17px;
+  margin: 0;
+}
+.opt .cfg {
+  color: var(--gold);
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 12px;
+  margin-top: 4px;
+}
+.metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 14px 0;
+}
+.metric .lbl {
+  color: var(--ink2);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.metric .val {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 18px;
+  color: var(--ink);
+  margin-top: 3px;
+}
+.handled {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+  columns: 2;
+  font-size: 12px;
+  color: var(--ink2);
+}
+.handled li::before {
+  content: "+ ";
+  color: var(--gold);
+}
+@media (max-width: 640px) {
+  .handled {
+    columns: 1;
+  }
+}

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Auric Axis - Equipment Sourcing",
+  title: "McCord Investments - Time to Power",
   description:
-    "Build the equipment universe a mine restart needs, then hunt the live market for every available used unit, nearest first.",
+    "Power for Canadian builds, sourced globally and placed in Canada, faster than the grid queue. Tell us what you are building.",
 };
 
 export default function RootLayout({

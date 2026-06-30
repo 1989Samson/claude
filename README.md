@@ -1,72 +1,75 @@
-# Auric Axis - Equipment Sourcing
+# McCord Investments - Time to Power
 
-A focused tool for sourcing heavy equipment for mine restarts and expansions.
-Two tabs:
+Power for Canadian builds, sourced globally and placed in Canada, faster than the
+grid queue. The site has two surfaces: a **public wedge** and an **internal desk**.
 
-## Sourcing
+## Public: Time to Power (`/`)
 
-1. **Build the equipment universe** - describe a mine/restart (name, location,
-   scope) and it produces the complete equipment list the project needs: plant,
-   mobile fleet, power, dewatering, support.
-2. **Hunt the live market** - for any line (or the whole universe at once), it
-   searches the web for real available used/rebuilt units, **nearest the site
-   first**, each with a source link, deduped and sorted local to international.
+The buyer-facing front door. A developer or data centre operator gives the
+minimum a serious enquiry needs (MW, province, when, power type, gas on site) and
+gets an indicative, engine-backed read:
 
-The output is the map; you work the reps and win the spread.
+- **The grid gap they face**, stated honestly per province (verified facts as of
+  mid-2026, sourced; Ontario stays general because no firm queue number is
+  published).
+- **Options to fit the stage**: a fast Bridge option and a permanent Prime
+  option, each with **equipment-to-pad weeks** (the slice of the path McCord
+  controls) and a **hard-rounded delivered band**. Every figure is Indicative.
+- **The annoying details, already handled**: customs, HS, heavy-haul, permits,
+  port, FX. The moat, made visible.
+- A **principal handoff**: a structured enquiry goes straight to a principal.
 
-## Transport
+It runs entirely client side on the transport engine, so it needs no API key and
+costs nothing, and it imports **no internal data**, so supply and sources can
+never reach the public bundle. It never shows a source or a precise number.
 
-Delivered-cost and time-to-site estimator for moving 60 Hz generation iron from
-a global source into a Canadian build. Given a unit (class, origin, value,
-weights) and a destination province, it returns a **two-tier** result:
+## Internal: the desk (`/desk`)
 
-- a **buyer view**, a deliberately coarse logistics band plus weeks-to-site,
-  rounded hard so a buyer cannot back into your margin, and
-- an **internal cost stack** on request, the real landed logistics number plus
-  the recoverable tax line, for building your quote.
+Sourcing, Transport, and the protected Supply registry. **Protect this route in
+deployment** (Vercel Deployment Protection); it reads internal data.
 
-The engine is a faithful TypeScript port of the `transport_estimator.py`
-prototype (v2). It is **pure and deterministic**: it runs in the browser, so it
-needs no API key, has no rate limit, and costs nothing. It never invents a
-number, every figure falls out of the unit, the corridor, and the editable rate
-tables. The reference spec and prototype live in `docs/transport/`.
+- **Sourcing** - build a project's equipment universe, then hunt the live market
+  for available used units, nearest first, each with a source link (Claude API).
+- **Transport** - the delivered-cost and time-to-site estimator, two-tier output
+  (coarse buyer band, full internal stack on request). Faithful TypeScript port
+  of `transport_estimator.py` (v2); reference in `docs/transport/`.
+- **Supply** - the protected registry of real units you can source. Grow it as
+  you go by editing `src/lib/supply/registry.json` (version controlled, no
+  database yet). Run any unit through the transport engine to a province. Origin
+  and source notes stay internal and never reach the public wedge.
 
 ## Stack
 
-Next.js (App Router, TypeScript) on Vercel. The Claude API does the work: a
-demand-universe generator (Sonnet) and a geo-tiered supply hunt with web search
-(Haiku, for low cost). No database required.
+Next.js (App Router, TypeScript) on Vercel. The transport and wedge engines are
+pure TypeScript (no API, no cost). The internal Sourcing tools use the Claude
+API: a demand-universe generator and a geo-tiered supply hunt with web search.
+No database required yet.
 
 ## Run it
 
-- Set `ANTHROPIC_API_KEY` (see `.env.example`). That's the only requirement.
 - `npm install`
-- `npm run dev` then open http://localhost:3000
+- `npm run dev` then open http://localhost:3000 (public wedge) and
+  http://localhost:3000/desk (internal desk).
 - `npm test` runs the unit tests; `npm run build` for production.
+- The internal Sourcing tabs need `ANTHROPIC_API_KEY` (see `.env.example`). The
+  public wedge and the Transport engine do not.
 
 ## Deploy (Vercel)
 
-Import the repo, set `ANTHROPIC_API_KEY` in Environment Variables, deploy. The
-app needs no database. Optionally turn on Vercel Authentication (Settings ->
-Deployment Protection) so only your team can open it.
-
-## Cost
-
-Supply runs on Claude Haiku with web search: roughly **$0.08-0.15 per equipment
-line** searched. A full ~30-line universe is a few dollars. Anthropic credit is
-prepaid, so spend is hard-capped. Override the model with `SUPPLY_MODEL` /
-`RESEARCH_MODEL`.
+Import the repo, deploy. Set `ANTHROPIC_API_KEY` if you use the Sourcing tabs.
+Turn on Vercel Authentication (Settings -> Deployment Protection) and scope it so
+**`/desk` is protected** while `/` stays public.
 
 ## Layout
 
-- `src/components/AppShell.tsx` - header plus the Sourcing / Transport tabs.
-- `src/components/SourcingApp.tsx` - the sourcing UI.
-- `src/components/TransportApp.tsx` - the transport calculator UI.
-- `src/lib/sourcing/demand.ts` - equipment-universe generator.
-- `src/lib/sourcing/supply.ts` - geo-tiered supply hunt.
-- `src/lib/sourcing/parse.ts` - tolerant JSON extraction.
-- `src/app/api/sourcing/{universe,find}` - the two endpoints.
+- `src/app/page.tsx` - public Time to Power wedge.
+- `src/app/desk/page.tsx` - internal desk (reads the supply registry server side).
+- `src/components/TimeToPower.tsx` - the public wedge UI.
+- `src/components/AppShell.tsx` - internal Sourcing / Transport / Supply tabs.
+- `src/lib/wedge/plan.ts` - inputs to engine-backed options (the read).
+- `src/lib/market/context.json` - verified, dated province grid-gap facts.
 - `src/lib/transport/engine.ts` - the delivered-cost engine (pure, no API).
 - `src/lib/transport/rates.json` - editable, versioned rate tables.
-- `src/lib/transport/schema.ts` - transport types and zod schemas.
+- `src/lib/supply/registry.json` - the protected supply registry (internal only).
+- `src/lib/sourcing/*` - the Claude-API demand and supply engines.
 - `docs/transport/` - the reference spec and Python prototype.

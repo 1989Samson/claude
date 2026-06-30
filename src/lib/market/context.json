@@ -1,0 +1,30 @@
+{
+  "asOf": "2026-06",
+  "disclaimer": "Grid and rate conditions move. These are directional facts as of mid-2026, not legal or engineering advice. We confirm the current position per project.",
+  "provinces": {
+    "AB": {
+      "name": "Alberta",
+      "headline": "The grid is allocated out.",
+      "detail": "Alberta's system operator gave its entire interim 1,200 MW large-load cap to two data centre projects. Around 37 more projects, roughly 19.4 GW, wait on a Phase 2 framework not expected to open a path before 2026 at the earliest. Provincial policy now favors bring your own power.",
+      "stance": "Bring your own power is the sanctioned route, not a workaround.",
+      "source": "https://www.cbc.ca/news/canada/calgary/ai-data-centre-alberta-electricity-9.6977136",
+      "verified": true
+    },
+    "ON": {
+      "name": "Ontario",
+      "headline": "Large-load connection rules are still forming.",
+      "detail": "Ontario is writing new rules for connecting large data centre loads. A firm queue position and timeline are case by case. On-site generation keeps your schedule in your own hands while the framework settles.",
+      "stance": "Hold your own timeline while the rules settle.",
+      "source": null,
+      "verified": false
+    },
+    "QC": {
+      "name": "Quebec",
+      "headline": "Grid power is being repriced upward.",
+      "detail": "Hydro-Quebec has proposed roughly doubling the rate for new data centres to about 13 cents per kWh, with about 19.5 cents for crypto, while forecasting data centre load to grow sevenfold past 1,000 MW by 2035. Access is tightening and the cost gap against on-site gas is narrowing.",
+      "stance": "On-site gas is increasingly the cost case, not just the speed case.",
+      "source": "https://www.cbc.ca/news/canada/montreal/hydro-quebec-rates-data-centres-9.7099056",
+      "verified": true
+    }
+  }
+}
